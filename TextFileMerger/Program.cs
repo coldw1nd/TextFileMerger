@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.IO;
 
 namespace TextFileMerger
 {
@@ -20,6 +21,27 @@ namespace TextFileMerger
             
         static void Main(string[] args)
         {
+            if (args.Length < 1)
+            {
+                return;
+            }
+            
+            string outputFilePath = args[0];
+            string currentDir = Directory.GetCurrentDirectory();
+            
+            IgnoredFiles.Add(Path.GetFileName(outputFilePath));
+
+            try
+            {
+                ProcessDirectory(currentDir, currentDir);
+                File.WriteAllText(outputFilePath, Output.ToString());
+
+                Console.WriteLine($"Successfully created: {outputFilePath}");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
 
         static void ProcessTextFile(string filePath, string rootDir)
