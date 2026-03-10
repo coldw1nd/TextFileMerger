@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextFileMerger", "TextFileMerger\TextFileMerger.csproj", "{AC2B1E06-F6C6-45E4-8595-5E6F34737376}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC2B1E06-F6C6-45E4-8595-5E6F34737376}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC2B1E06-F6C6-45E4-8595-5E6F34737376}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC2B1E06-F6C6-45E4-8595-5E6F34737376}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC2B1E06-F6C6-45E4-8595-5E6F34737376}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
