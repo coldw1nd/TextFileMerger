@@ -56,13 +56,13 @@ namespace TextFileMerger
             {
                 outputFilePath = args[0];
             }
+
+            string outputFilePathAbs = Path.GetFullPath(outputFilePath);
             string currentDir = Directory.GetCurrentDirectory();
-            
-            IgnoredFiles.Add(Path.GetFileName(outputFilePath));
 
             try
             {
-                ProcessDirectory(currentDir, currentDir);
+                ProcessDirectory(currentDir, currentDir, outputFilePathAbs);
                 File.WriteAllText(outputFilePath, Output.ToString());
 
                 Console.WriteLine($"Successfully created: {outputFilePath}");
@@ -73,36 +73,88 @@ namespace TextFileMerger
             }
         }
 
-        static void ProcessTextFile(string filePath, string rootDir)
+        static bool HasAllowedExtension(string fileName)
         {
-            string relativePath = filePath.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar);
-
-            Output.AppendLine($"// ======== FILE: {relativePath} ========");
-            Output.AppendLine(File.ReadAllText(filePath));
-            Output.AppendLine();
-        }
-
-        static void ProcessDirectory(string currentDir, string rootDir)
-        {
-            foreach (var filePath in Directory.GetFiles(currentDir))
+            int dotIndex = fileName.IndexOf('.');
+            
+            while (dotIndex>=0)
             {
-                string fileName = Path.GetFileName(filePath);
-                string extension = Path.GetExtension(filePath);
-
-                if (IgnoredFiles.Contains(fileName))
-                {
-                    continue;
-                }
-
+                string extension = fileName.Substring(dotIndex);
+                
                 if (AllowedExtensions.Contains(extension))
                 {
-                    ProcessTextFile(filePath, rootDir);
+                    return true;
+                }
+                
+                dotIndex = fileName.IndexOf('.', dotIndex + 1);
+            }
+            
+            return false;
+        }
+
+        static void ProcessTextFile(string filePath, string rootDir)
+        {
+            try
+            {
+                string relativePath = filePath.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar);
+
+                Output.AppendLine($"// ======== FILE: {relativePath} ========");
+                Output.AppendLine(File.ReadAllText(filePath));
+                Output.AppendLine();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        static void ProcessDirectory(string currentDir, string rootDir, string outputFilePathAbs)
+        {
+            try
+            {
+                foreach (var filePath in Directory.GetFiles(currentDir))
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    string filePathAbs = Path.GetFullPath(filePath);
+
+                    if (filePathAbs.Equals(outputFilePathAbs))
+                    {
+                        continue;
+                    }
+
+                    if (IgnoredFiles.Contains(fileName))
+                    {
+                        continue;
+                    }
+
+                    if (AllowedFileNames.Contains(fileName))
+                    {
+                        ProcessTextFile(filePath, rootDir);
+                        continue;
+                    }
+
+                    if (HasAllowedExtension(fileName))
+                    {
+                        ProcessTextFile(filePath, rootDir);
+                    }
+                }
+
+                foreach (var dir in Directory.GetDirectories(currentDir))
+                {
+                    string dirName = Path.GetFileName(dir);
+                    if (IgnoredDirectories.Contains(dirName))
+                    {
+                        continue;
+                    }
+
+                    ProcessDirectory(dir, rootDir, outputFilePathAbs);
                 }
             }
-
-            foreach (var dir in Directory.GetDirectories(currentDir))
+            catch (UnauthorizedAccessException) {}
+            
+            catch (Exception ex)
             {
-                ProcessDirectory(dir, rootDir);
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
     }
