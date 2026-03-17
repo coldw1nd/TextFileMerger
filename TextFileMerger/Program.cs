@@ -72,7 +72,7 @@ namespace TextFileMerger
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
-
+            
         static bool HasAllowedExtension(string fileName)
         {
             int dotIndex = fileName.IndexOf('.');
@@ -91,14 +91,42 @@ namespace TextFileMerger
             
             return false;
         }
+        
+        static bool IsBinaryFile(string filePath)
+        {
+            try
+            {
+                using (FileStream stream = File.OpenRead(filePath))
+                {
+                    int currentByte;
+                    int bytesRead = 0;
+                    while ((currentByte = stream.ReadByte()) != -1 && bytesRead < 512)
+                    {
+                        if (currentByte == 0)
+                        {
+                            return true;
+                        }
+
+                        bytesRead++;
+                    }
+                }
+
+                return false;
+            }
+            catch
+            {
+                return true;
+            }
+        }
 
         static void ProcessTextFile(string filePath, string rootDir)
         {
             try
             {
+                if (IsBinaryFile(filePath)) return;
                 string relativePath = filePath.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar);
 
-                Output.AppendLine($"// ======== FILE: {relativePath} ========");
+                Output.AppendLine($"======== FILE: {relativePath} ========");
                 Output.AppendLine(File.ReadAllText(filePath));
                 Output.AppendLine();
             }
