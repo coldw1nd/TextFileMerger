@@ -125,10 +125,10 @@ namespace TextFileMerger
         {
             try
             {
+				if (IsBinaryFile(filePath)) return;
+				
                 FileInfo fileinfo = new FileInfo(filePath);
-                if (fileinfo.Length > MaxFileSizeBytes) return;
-                
-                if (IsBinaryFile(filePath)) return;
+			    if (fileinfo.Length > MaxFileSizeBytes) Console.WriteLine($"Предупреждение: Вес файла {filePath} превышает 1МБ");
                 
                 string relativePath = filePath.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar);
 
